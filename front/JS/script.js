@@ -1,27 +1,39 @@
+// Je récupère les produits et leurs caractéristiques dans API HTTP
 const reponse = await fetch ("http://localhost:3000/api/products")
 const produits = await reponse.json();
 
-const imageElement = document.createElement("img");
-imageElement.src = produits[0].imageUrl;
-imageElement.alt = produits[0].altTxt;
-const nomElement = document.createElement("h3");
-nomElement.innerText = produits[0].name;
-nomElement.className = "productName";
-const descriptionElement = document.createElement("p");
-descriptionElement.innerText = produits[0].description;
-descriptionElement.className = "productDescription";
+for (let i = 0; i<produits.length ; i++){
 
-const articleElement = document.createElement("article");
-articleElement.appendChild(imageElement)
-articleElement.appendChild(nomElement);
-articleElement.appendChild(descriptionElement);
+    const imageElement = document.createElement("img");
+        imageElement.src = produits[i].imageUrl;
+        imageElement.alt = produits[i].altTxt;
+    
+    const nomElement = document.createElement("h3");
+        nomElement.innerText = produits[i].name;
+        nomElement.className = "productName";
+    
+    const descriptionElement = document.createElement("p");
+        descriptionElement.innerText = produits[i].description;
+        descriptionElement.className = "productDescription";
+    
+    const articleElement = document.createElement("article");
+        articleElement.appendChild(imageElement);
+        articleElement.appendChild(nomElement);
+        articleElement.appendChild(descriptionElement);
+    
+// Avoir l'id du produit 
+    const productId = produits[i]._id;
 
-const product = document.createElement("a");
-product.href = "./product.html?id=42";
-product.appendChild(articleElement);
+    const product = document.createElement("a");
+        // permet de distribuer l'id produit à chaque lien 
+        product.href = `./product.html?id=${productId}`;
+        product.appendChild(articleElement);
+    
+    const sectionItems = document.querySelector("#items");
+        sectionItems.appendChild(product);
+  
+}
 
-const sectionItems = document.querySelector("#items");
-sectionItems.appendChild(product);
 
 
 
