@@ -1,8 +1,3 @@
-
-// const produits = fetch ("http://localhost:3000/api/products")
-//     .then (produits => produits.json())
-//     .then (reponse => reponse);
-
 const reponse = await fetch ("http://localhost:3000/api/products")
 const produits = await reponse.json();
 
