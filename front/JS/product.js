@@ -38,11 +38,9 @@ class ModelChoiceProduct {
             this.color = color,
             this.quantity = quantity
     }
-}
+};
 
-let array = [];
-
-// J'ajoute un écouteur d'événement "click" sur le bouton
+// J'ajoute un eventlistener "click" sur le bouton
 document.querySelector("#addToCart")
     .addEventListener("click", function () {
 
@@ -50,49 +48,33 @@ document.querySelector("#addToCart")
         let choiceColor = document.querySelector("#colors").value;
         let choiceQuantity = document.querySelector("#quantity").value;
 
-        // je recupère ma classe
-        // let choiceProduct = new ModelChoiceProduct(productId,choiceColor,parseInt(choiceQuantity));
-        // je recupère mon tableau
-        let choiceProduct = [productId, choiceColor, parseInt(choiceQuantity)]
+        let choiceProduct = new ModelChoiceProduct(
+            productId,
+            choiceColor,
+            parseInt(choiceQuantity)
+        );
+        
+        let chargeLS = JSON.parse(localStorage.getItem("product"));
 
-        // si tableau vide ... push un élément sinon ajouté +1 à la quantité
-        if (array.length === 0) {
-            array.push(choiceProduct);
-            console.log("test=>1");
+        if (chargeLS === null && choiceColor !== "" && choiceQuantity !== 0) {
+            chargeLS = [];
+            chargeLS.push(choiceProduct);
+            localStorage.setItem("product", JSON.stringify(chargeLS));
+            console.log("test=>1")
         } else {
-            array.forEach(function (choice, index) {
-                if (choice[0] == choiceProduct[0] && choice[1] == choiceProduct[1]) {
-                    choice[2] += choiceProduct[2];
-                    console.log("test=>2", array, choice);
-                } else if (choice[0] == choiceProduct[0] && choice[1] != choiceProduct[1]) {
-                    array.push(choiceProduct);
-                    console.log("test=>3", array);
-                }
-            })
+            let searchProduct = chargeLS.findIndex((product => product.id === choiceProduct.id &&
+                product.color === choiceProduct.color));
+            if (searchProduct === -1 && choiceColor !== "" && choiceQuantity !== 0) {
+                chargeLS.push(choiceProduct);
+                localStorage.setItem("product", JSON.stringify(chargeLS))
+                console.log("test=>2");
+            } else {
+                chargeLS[searchProduct].quantity += choiceProduct.quantity;
+                console.log("test=>3")
+            }
         }
-
-        //     for (let choice of array){
-        //         if(choice.id === choiceProduct.id && choice.color !== choiceProduct.color){
-        //             array.push(choiceProduct);
-        //             console.log("test=>2");
-        //             break
-        //         }else if(choice.id === choiceProduct.id && choice.color === choiceProduct.color){
-        //             choice.quantity += choiceProduct.quantity,
-        //             console.log("test=>3",choice.quantity);
-        //         }
-        //     }
-        // }
-
-        // let chargeLS = JSON.parse(localStorage.getItem("product"));
-
-        // if (chargeLS === null) {
-        //     chargeLS =[];
-        //     chargeLS.push(choiceProduct)
-        //     localStorage.setItem("product", JSON.stringify(chargeLS))
-        //     console.log("test ==> 1", chargeLS)
-        // }else{
-        //     console.log("test=>2", chargeLS)
-        // }
+        localStorage.setItem("product", JSON.stringify(chargeLS));
+        console.log("test=>final!", chargeLS);
     })
 
 
