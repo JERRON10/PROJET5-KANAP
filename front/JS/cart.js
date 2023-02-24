@@ -1,7 +1,6 @@
+// Récupèrer les données du LS 
 let chargeLS = JSON.parse(localStorage.getItem("product"));
-
 console.log("tableauLS=>", chargeLS);
-console.log("tableauLS=>", chargeLS[0].id);
 
 let reponsePageProduct;
 let pageProduct;
@@ -9,7 +8,7 @@ let sumQuantity = 0;
 let PriceProduct = 0;
 let sumPrice = 0;
 
-// boucle for pour créer les élements... 
+// boucle pour créer les élements... 
 for (let i = 0; i < chargeLS.length; i++) {
     reponsePageProduct = await fetch(`http://localhost:3000/api/products/${chargeLS[i].id}`);
     pageProduct = await reponsePageProduct.json();
@@ -89,7 +88,7 @@ for (let i = 0; i < chargeLS.length; i++) {
     sumPrice += PriceProduct
 }
 
-
+// creation des balises pour la quantité et le prix
 let totalQuantity = document.createElement("p");
 totalQuantity.innerText = `${sumQuantity}`;
 let spanTotalQuantity = document.querySelector("#totalQuantity");
@@ -106,6 +105,7 @@ let collectQuantity = 0;
 let collectId;
 let collectColor;
 
+// ajout d'un eventListener au changement de quantité et modifier le LS 
 for (let i = 0; i < selectQuantity.length; i++) {
     selectQuantity[i].addEventListener("change", function () {
         collectQuantity = parseInt(selectQuantity[i].value);
@@ -122,7 +122,7 @@ for (let i = 0; i < selectQuantity.length; i++) {
     })
 };
 
-// ajout un ecouteur d'évenement à chaques bouttons supprimer
+// ajout d'un eventListener à chaques bouttons supprimer et supprimer au click dans le lS
 let selectDelete = document.querySelectorAll(".deleteItem");
 for (let i = 0; i < selectDelete.length; i++) {
     selectDelete[i].addEventListener("click", function () {
