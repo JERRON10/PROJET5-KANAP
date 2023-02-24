@@ -1,25 +1,30 @@
 let chargeLS = JSON.parse(localStorage.getItem("product"));
 
-console.log(chargeLS);
+console.log("tableauLS=>", chargeLS);
+console.log("tableauLS=>", chargeLS[0].id);
 
 let reponsePageProduct;
 let pageProduct;
 let sumQuantity = 0;
+let PriceProduct = 0;
+let sumPrice = 0;
 
-for (let choice of chargeLS) {
-    reponsePageProduct = await fetch(`http://localhost:3000/api/products/${choice.id}`)
+// boucle for pour créer les élements... 
+for (let i = 0; i < chargeLS.length; i++) {
+    reponsePageProduct = await fetch(`http://localhost:3000/api/products/${chargeLS[i].id}`);
     pageProduct = await reponsePageProduct.json();
+    console.log(pageProduct)
 
-    let articleElement = document.createElement("article");
+    let articleElement = document.createElement(`article${[i]}`);
     articleElement.className = "cart__item";
-    articleElement.dataset.id = choice.id;
-    articleElement.dataset.color = choice.color;
+    articleElement.dataset.id = `${chargeLS[i].id}`;
+    articleElement.dataset.color = `${chargeLS[i].color}`;
     let sectionCartItem = document.querySelector("#cart__items");
     sectionCartItem.appendChild(articleElement);
 
     let divImg = document.createElement("div");
     divImg.className = "cart__item__img";
-    let articleCartItem = document.querySelector("article");
+    let articleCartItem = document.querySelector(`article${[i]}`);
     articleCartItem.appendChild(divImg);
 
     let imgElement = document.createElement("img");
@@ -32,7 +37,7 @@ for (let choice of chargeLS) {
     articleCartItem.appendChild(divContent);
 
     let divDescription = document.createElement("div");
-    divDescription.className ="cart__item__content__description";
+    divDescription.className = "cart__item__content__description";
     divContent.appendChild(divDescription);
 
     let descriptionTitle = document.createElement("h2");
@@ -40,9 +45,9 @@ for (let choice of chargeLS) {
     divDescription.appendChild(descriptionTitle);
 
     let descriptionCouleur = document.createElement("p")
-    descriptionCouleur.innerText = choice.color;
+    descriptionCouleur.innerText = chargeLS[i].color;
     divDescription.appendChild(descriptionCouleur);
-    
+
     let descriptionPrice = document.createElement("p");
     descriptionPrice.innerText = `${pageProduct.price}€`;
     divDescription.appendChild(descriptionPrice);
@@ -65,22 +70,72 @@ for (let choice of chargeLS) {
     quantityInput.name = "itemQuantity";
     quantityInput.min = "1";
     quantityInput.max = "100";
-    quantityInput.value = choice.quantity;
+    quantityInput.value = chargeLS[i].quantity;
     divSettingsQuantity.appendChild(quantityInput);
 
     let settingsDelete = document.createElement("div");
     settingsDelete.className = "cart__item__content__settings__delete";
     divsettings.appendChild(settingsDelete);
-    
+
     let settingsDeleteItem = document.createElement("p");
     settingsDeleteItem.className = "deleteItem";
     settingsDeleteItem.innerText = "supprimer";
     divsettings.appendChild(settingsDeleteItem);
 
-    sumQuantity += choice.quantity;
+    // Calcule de la quantité
+    sumQuantity += chargeLS[i].quantity;
+    PriceProduct = sumQuantity * pageProduct.price;
+    // calcule du prix
+    sumPrice += PriceProduct
 }
-console.log(sumQuantity)
+
+
 let totalQuantity = document.createElement("p");
 totalQuantity.innerText = `${sumQuantity}`;
 let spanTotalQuantity = document.querySelector("#totalQuantity");
 spanTotalQuantity.appendChild(totalQuantity)
+
+let totalPrice = document.createElement("p");
+totalPrice.innerText = `${sumPrice}`;
+let spanTotalPrice = document.querySelector("#totalPrice");
+spanTotalPrice.appendChild(totalPrice);
+
+// récupérer la quantité, la couleur et l'id des inputs
+let selectQuantity = document.querySelectorAll(".itemQuantity");
+let collectQuantity = 0;
+let collectId;
+let collectColor;
+
+for (let i = 0; i < selectQuantity.length; i++) {
+    selectQuantity[i].addEventListener("change", function () {
+        collectQuantity = parseInt(selectQuantity[i].value);
+        collectId = selectQuantity[i].closest(".cart__item").dataset.id;
+        collectColor = selectQuantity[i].closest(".cart__item").dataset.color;
+        console.log("test modif=>", collectId, collectColor, collectQuantity);
+
+        let search = chargeLS.findIndex(product => product.id === collectId &&
+            product.color === collectColor && product.quantity !== collectQuantity);
+        if (search !== -1)
+            chargeLS[search].quantity = collectQuantity;
+        localStorage.setItem("product", JSON.stringify(chargeLS))
+        console.log("test=> recherche", search);
+    })
+};
+
+// ajout un ecouteur d'évenement à chaques bouttons supprimer
+let selectDelete = document.querySelectorAll(".deleteItem");
+for (let i = 0; i < selectDelete.length; i++) {
+    selectDelete[i].addEventListener("click", function () {
+        collectId = selectDelete[i].closest(".cart__item").dataset.id;
+        collectColor = selectDelete[i].closest(".cart__item").dataset.color;
+        console.log("produit à supprimer", collectId, collectColor);
+
+        for (let i = chargeLS.length - 1; i >= 0; i--) {
+            if (chargeLS[i].id === collectId && chargeLS[i].color === collectColor) {
+                chargeLS.splice(i, 1);
+                console.log("nouveau tableau", chargeLS);
+                localStorage.setItem("product", JSON.stringify(chargeLS));
+            }
+        }
+    })
+}

@@ -44,7 +44,7 @@ class ModelChoiceProduct {
 document.querySelector("#addToCart")
     .addEventListener("click", function () {
 
-        // Je capture les valeurs sélectionner
+// Je capture les valeurs sélectionnées
         let choiceColor = document.querySelector("#colors").value;
         let choiceQuantity = document.querySelector("#quantity").value;
 
