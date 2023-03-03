@@ -1,6 +1,6 @@
 let dataproduct;
-let total_price = 0;
 let total_quantity = 0;
+let total_price = 0;
 let chargeLS = await chargeLocalstorage();
 
 await init();
@@ -10,20 +10,27 @@ async function init() {
 
     // 1 - Récupèrer les données du LocalStorage
     chargeLS;
+    console.log("avant=>", total_quantity)
+    total_quantity = 0;
+    total_price = 0;
+
+
     // 2 - On créer les élements et on calcul le total
     for (let i = 0; i < chargeLS.length; i++) {
         let reponsePageProduct = await fetch(`http://localhost:3000/api/products/${chargeLS[i].id}`);
         dataproduct = await reponsePageProduct.json();
 
         createProductHtmlInCartAndMangeEvents(i, dataproduct)
-
+        console.log("avant=>", total_quantity)
         total_price += chargeLS[i].quantity * dataproduct.price;
         total_quantity += chargeLS[i].quantity;
-        console.log("quantités => ", total_quantity);
+        console.log("après quantités => ", total_quantity);
+        console.log("quantités chargels => ", chargeLS[i].quantity);
+    
     }
 
     // 3 - Maintenant qu'on a les totaux on les affiche
-    createCartTotalPrice(total_price);
+    createCartTotalPrice(total_price);  
     createCartTotalQuantity(total_quantity);
 }
 
@@ -131,7 +138,7 @@ function createProductHtmlInCartAndMangeEvents(index, product_to_create) {
     divDescription.appendChild(descriptionTitle);
 
     let descriptionCouleur = document.createElement("p");
-    descriptionCouleur.innerText = chargeLS[index].colors;
+    descriptionCouleur.innerText = chargeLS[index].color;
     divDescription.appendChild(descriptionCouleur);
 
     let descriptionPrice = document.createElement("p");
