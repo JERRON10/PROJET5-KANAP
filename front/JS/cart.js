@@ -239,20 +239,21 @@ submitForm.addEventListener("click", function (e) {
         products
     }
 
-    console.log("contact=>", contact);
-    console.log("produit_id=>", products);
-    console.log("chargeUtile=>", chargeUtile);
-
+    // Vérification tous les regexp pour valider, si valide => requête POST
     if ((validFirstName(firstName) && validLastName(lastName)
         && validAddress(address) && validCity(city) && validEmail(email)) == true) {
-
-        // saveLocalstorage("client", formValues);
 
         fetch("http://localhost:3000/api/products/order", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(chargeUtile)
-        });
+        })
+
+            .then(response => response.json())
+            .then(data => window.location = `./confirmation.html?orderId=${data.orderId}`);
+
+            localStorage.removeItem("product");
+
     } else {
         console.log("false");
         alert("Formulaire non valide");
