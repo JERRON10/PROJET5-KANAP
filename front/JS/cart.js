@@ -15,44 +15,29 @@ async function init() {
     chargeLS;
     total_quantity = 0;
     total_price = 0;
+
     // 2 - On créer les élements et on calcul le total
     for (let i = 0; i < chargeLS.length; i++) {
 
-        let reponsePageProduct = await useFetch(chargeLS[i].id);
+        let reponsePageProduct = await collectProduct(chargeLS[i].id);
         dataproduct = await reponsePageProduct.json();
+
         createProductHtmlInCartAndMangeEvents(i, dataproduct)
+
         total_price += chargeLS[i].quantity * dataproduct.price;
         total_quantity += chargeLS[i].quantity;
     }
+
     // 3 - Maintenant qu'on a les totaux on les affiche
     createCartTotalPrice(total_price);
     createCartTotalQuantity(total_quantity);
 }
 
-async function useFetch(path) {
-    return await fetch(`http://localhost:3000/api/products/${path}`);
-}
-
-// Récupére le localStorage
-async function chargeLocalstorage() {
-    return JSON.parse(localStorage.getItem("product"));
-}
-
-// Sauvegarde dans le localStorage
-async function saveLocalstorage(clé, valeur) {
-    localStorage.setItem(clé, JSON.stringify(valeur));
-}
-
-// récupérer la quantité, la couleur et l'id des inputs
-let collectQuantity, collectId, collectColor;
-
 // Ajout d'un eventListener à chaques inputs quantités
 function manageProductQuantityChanged(quantityInput) {
     quantityInput.addEventListener("change", function () {
 
-        collectQuantity = parseInt(quantityInput.value);
-        collectId = quantityInput.closest(".cart__item").dataset.id;
-        collectColor = quantityInput.closest(".cart__item").dataset.color;
+        let { collectId, collectColor, collectQuantity } = newFunction();
 
         let search = chargeLS.findIndex(product => product.id === collectId &&
             product.color === collectColor && product.quantity !== collectQuantity);
@@ -65,6 +50,13 @@ function manageProductQuantityChanged(quantityInput) {
             deleteWithHtml("#totalPrice");
             init();
         }
+
+        function newFunction() {
+            let collectQuantity = parseInt(quantityInput.value);
+            let collectId = quantityInput.closest(".cart__item").dataset.id;
+            let collectColor = quantityInput.closest(".cart__item").dataset.color;
+            return { collectId, collectColor, collectQuantity };
+        }
     });
 }
 
@@ -72,8 +64,8 @@ function manageProductQuantityChanged(quantityInput) {
 function manageProductDeleted(settingsDeleteItem) {
     settingsDeleteItem.addEventListener("click", function () {
 
-        collectId = settingsDeleteItem.closest(".cart__item").dataset.id;
-        collectColor = settingsDeleteItem.closest(".cart__item").dataset.color;
+        let collectId = settingsDeleteItem.closest(".cart__item").dataset.id;
+        let collectColor = settingsDeleteItem.closest(".cart__item").dataset.color;
 
         for (let i = chargeLS.length - 1; i >= 0; i--) {
             if (chargeLS[i].id === collectId && chargeLS[i].color === collectColor) {
@@ -86,6 +78,21 @@ function manageProductDeleted(settingsDeleteItem) {
             }
         }
     });
+}
+
+// Récupére le localStorage
+async function chargeLocalstorage() {
+    return JSON.parse(localStorage.getItem("product"));
+}
+
+async function collectProduct(path) {
+    return await fetch(`http://localhost:3000/api/products/${path}`);
+}
+
+
+// Sauvegarde dans le localStorage
+async function saveLocalstorage(clé, valeur) {
+    localStorage.setItem(clé, JSON.stringify(valeur));
 }
 
 function createCartTotalPrice(total_price) {
@@ -248,11 +255,10 @@ submitForm.addEventListener("click", function (e) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(chargeUtile)
         })
-
             .then(response => response.json())
             .then(data => window.location = `./confirmation.html?orderId=${data.orderId}`);
 
-            localStorage.removeItem("product");
+        localStorage.removeItem("product");
 
     } else {
         console.log("false");
@@ -260,6 +266,7 @@ submitForm.addEventListener("click", function (e) {
     }
 });
 
+// les testes de validation
 let validFirstName = function (inputselect) {
     let FirstNameRegExp = new RegExp(
         "^[A-Za-z\é\è\ê\-ôï]{2,25}$", "g"
