@@ -1,4 +1,4 @@
-// Avec searchParams, extraire l'id de la page d'acceuil
+// Avec searchParams, extraire l'orderId de la page panier.
 const fullUrl = window.location.href;
 const url = new URL(fullUrl);
 const commandNumber = url.searchParams.get("orderId");

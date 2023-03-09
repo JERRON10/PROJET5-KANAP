@@ -1,6 +1,6 @@
 // ********************************** LE PANIER ***********************************
 
-//Les variables
+//Les variables.
 let dataproduct;
 let total_quantity = 0;
 let total_price = 0;
@@ -8,15 +8,15 @@ let chargeLS = await chargeLocalstorage();
 
 await init();
 
-// Régénère l'ensemble de la page
+// Régénère l'ensemble de la page.
 async function init() {
 
-    // 1 - Récupèrer les données du LocalStorage
+    // 1 - Récupèrer les données du LocalStorage.
     chargeLS;
     total_quantity = 0;
     total_price = 0;
 
-    // 2 - On créer les élements et on calcul le total
+    // 2 - On créer les élements à partir du produit récupéré et on calcul le total.
     for (let i = 0; i < chargeLS.length; i++) {
 
         let reponsePageProduct = await collectProduct(chargeLS[i].id);
@@ -28,16 +28,18 @@ async function init() {
         total_quantity += chargeLS[i].quantity;
     }
 
-    // 3 - Maintenant qu'on a les totaux on les affiche
+    // 3 - Maintenant qu'on a les totaux on les affiche.
     createCartTotalPrice(total_price);
     createCartTotalQuantity(total_quantity);
 }
 
-// Ajout d'un eventListener à chaques inputs quantités
+// Ajout d'un eventListener à chaques inputs quantités.
 function manageProductQuantityChanged(quantityInput) {
     quantityInput.addEventListener("change", function () {
 
-        let { collectId, collectColor, collectQuantity } = newFunction();
+        let collectQuantity = parseInt(quantityInput.value);
+        let collectId = quantityInput.closest(".cart__item").dataset.id;
+        let collectColor = quantityInput.closest(".cart__item").dataset.color;
 
         let search = chargeLS.findIndex(product => product.id === collectId &&
             product.color === collectColor && product.quantity !== collectQuantity);
@@ -50,17 +52,10 @@ function manageProductQuantityChanged(quantityInput) {
             deleteWithHtml("#totalPrice");
             init();
         }
-
-        function newFunction() {
-            let collectQuantity = parseInt(quantityInput.value);
-            let collectId = quantityInput.closest(".cart__item").dataset.id;
-            let collectColor = quantityInput.closest(".cart__item").dataset.color;
-            return { collectId, collectColor, collectQuantity };
-        }
     });
 }
 
-// Ajout d'un eventListener à chaques bouttons delete et SUPPRIMER au click dans le lS
+// Ajout d'un eventListener à chaques bouttons delete et SUPPRIMER au click dans le LS.
 function manageProductDeleted(settingsDeleteItem) {
     settingsDeleteItem.addEventListener("click", function () {
 
@@ -80,17 +75,17 @@ function manageProductDeleted(settingsDeleteItem) {
     });
 }
 
-// Récupére le localStorage
+// Récupérer le localStorage.
 async function chargeLocalstorage() {
     return JSON.parse(localStorage.getItem("product"));
 }
 
+// Récupérer les données d'un produit avec la methode fetch.
 async function collectProduct(path) {
     return await fetch(`http://localhost:3000/api/products/${path}`);
 }
 
-
-// Sauvegarde dans le localStorage
+// Sauvegarde dans le LS.
 async function saveLocalstorage(clé, valeur) {
     localStorage.setItem(clé, JSON.stringify(valeur));
 }
@@ -103,7 +98,7 @@ function createCartTotalPrice(total_price) {
 }
 
 function createCartTotalQuantity(total_quantity) {
-    // creation des balises pour la quantité et le prix
+    // Création des balises pour la quantité et le prix.
     let totalQuantity = document.createElement("p");
     totalQuantity.innerText = total_quantity;
     let spanTotalQuantity = document.querySelector("#totalQuantity");
@@ -111,7 +106,7 @@ function createCartTotalQuantity(total_quantity) {
 }
 
 function createProductHtmlInCartAndMangeEvents(index, product_to_create) {
-    // 1 - Créer l'html
+    // 1 - Créer l'html.
     let articleElement = document.createElement("article");
     articleElement.className = "cart__item";
     articleElement.dataset.id = chargeLS[index].id;
@@ -178,54 +173,54 @@ function createProductHtmlInCartAndMangeEvents(index, product_to_create) {
     settingsDeleteItem.innerText = "supprimer";
     settingsDelete.appendChild(settingsDeleteItem);
 
-    // 2 - Gérer les events
+    // 2 - Gérer les events.
     manageProductQuantityChanged(quantityInput);
     manageProductDeleted(settingsDeleteItem);
 }
 
-// Supprime une balise
+// Supprime une balise.
 async function deleteWithHtml(tag) {
     document.querySelector(tag).innerHTML = "";
 }
 
 // ********************************* FORMULAIRE ************************************
 
-// RegExp firstName
+// RegExp firstName.
 let firstName = document.querySelector("#firstName");
 firstName.addEventListener("change", function () {
     validFirstName(this);
 })
 
-// RegExp lastName
+// RegExp lastName.
 let lastName = document.querySelector("#lastName");
 lastName.addEventListener("change", function () {
     validLastName(this);
 })
 
-// RegExp address
+// RegExp address.
 let address = document.querySelector("#address");
 address.addEventListener("change", function () {
     validAddress(this);
 })
 
-// RegExp city
+// RegExp city.
 let city = document.querySelector("#city");
 city.addEventListener("change", function () {
     validCity(this);
 })
 
-// RegExp email
+// RegExp email.
 let email = document.querySelector("#email");
 email.addEventListener("change", function () {
     validEmail(this);
 })
 
-// Validation du formulaire
+// Validation du formulaire.
 let submitForm = document.querySelector("#order");
 submitForm.addEventListener("click", function (e) {
     e.preventDefault();
 
-    // Mon objet contact
+    // Mon objet contact.
     let contact = {
         firstName: firstName.value,
         lastName: lastName.value,
@@ -234,19 +229,19 @@ submitForm.addEventListener("click", function (e) {
         email: email.value
     };
 
-    // Mon tableau product_id
+    // Mon tableau product_id.
     let products = [];
     for (let i = 0; i < chargeLS.length; i++) {
         products.push(chargeLS[i].id);
     }
 
-    // Mon objet à envoyer à l'API (contact, products)
+    // Mon objet à envoyer à l'API (contact, products).
     let chargeUtile = {
         contact,
         products
     }
 
-    // Vérification tous les regexp pour valider, si valide => requête POST
+    // Vérifier tous les regexp pour valider. Si valide => requête POST.
     if ((validFirstName(firstName) && validLastName(lastName)
         && validAddress(address) && validCity(city) && validEmail(email)) == true) {
 
@@ -266,10 +261,10 @@ submitForm.addEventListener("click", function (e) {
     }
 });
 
-// les testes de validation
+// les testes de validation.
 let validFirstName = function (inputselect) {
     let FirstNameRegExp = new RegExp(
-        "^[A-Za-z\é\è\ê\-ôï]{2,25}$", "g"
+        "^[A-Za-zéèêëôï\-]{2,25}$", "g"
     );
     let testFirstName = FirstNameRegExp.test(inputselect.value);
     let firstNameErrorMessage = document.querySelector("#firstNameErrorMsg");
@@ -285,7 +280,7 @@ let validFirstName = function (inputselect) {
 
 let validLastName = function (inputselect) {
     let lastNameRegExp = new RegExp(
-        "^[A-Za-z\é\è\ê\-ôï]{2,25}$", "g"
+        "^[A-Za-zéèêëôï\-]{2,25}$", "g"
     );
     let testName = lastNameRegExp.test(inputselect.value);
     let lastNameErrorMessage = document.querySelector("#lastNameErrorMsg");

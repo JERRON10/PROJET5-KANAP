@@ -14,12 +14,12 @@ createPriceElement();
 
 createDescriptionElement();
 
-// récupérer les valeurs du tableau couleurs d'un produit avec for...of.
+// Récupérer les valeurs du tableau couleurs d'un produit avec for...of.
 for (let color of dataProduct.colors) {
     createColorElement(color);
 }
 
-// creation de la classe d'un produit.
+// Création de la classe d'un produit.
 class ModelChoiceProduct {
     constructor(id, color, quantity) {
         this.id = id,
@@ -28,7 +28,7 @@ class ModelChoiceProduct {
     }
 };
 
-// J'ajoute un eventlistener "click" sur le bouton.
+// J'ajoute un eventlistener "click" sur le bouton "Ajouter au panier".
 document.querySelector("#addToCart")
     .addEventListener("click", function () {
 
@@ -44,18 +44,30 @@ document.querySelector("#addToCart")
 
         // Je récupére les données du LocalStorage.
         let chargeLS = JSON.parse(localStorage.getItem("product"));
-        // Si le LocalStorage est nul et que la couleur et la quanité est différente de 0 alors ajouter le produit.
+
+        // Si le LocalStorage est vide
+        //  et que la couleur est différente de ""
+        //  et que la quantité est différente de 0 alors ajouter le produit au tableau.
         if (chargeLS === null && choiceColor !== "" && choiceQuantity !== 0) {
             chargeLS = [];
             chargeLS.push(choiceProduct);
+
+            // Sauvegarder dans le LS.
             localStorage.setItem("product", JSON.stringify(chargeLS));
-            //Sinon si même produit ajuster la quantité au bon produit.
+
         } else {
+
+            //FindIndex permet de trouver un produit... si le produit n'est pas trouver
+            // la méthode renvoie -1.
             let searchProduct = chargeLS.findIndex((product => product.id === choiceProduct.id &&
                 product.color === choiceProduct.color));
+
+            // ajout d'un produit si le produit n'est pas trouvé et sauvegarder
             if (searchProduct === -1 && choiceColor !== "" && choiceQuantity !== 0) {
                 chargeLS.push(choiceProduct);
-                localStorage.setItem("product", JSON.stringify(chargeLS))
+                localStorage.setItem("product", JSON.stringify(chargeLS));
+
+            // Si produit trouvé incrémenter la quantité du produit trouvé.
             } else {
                 chargeLS[searchProduct].quantity += choiceProduct.quantity;
             }
@@ -99,7 +111,3 @@ function createColorElement(color) {
     const idColor = document.querySelector("#colors");
     idColor.appendChild(colorElement);
 }
-
-
-
-
