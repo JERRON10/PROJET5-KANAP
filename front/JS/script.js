@@ -1,7 +1,7 @@
 // 1 - Je récupère tous les produits dans API HTTP
 const produits = await collectAllProducts();
 
-// 2 - J'utilise for sur tous les produits récupérés pour créer les élements et les liens.
+// 2 - J'utilise la boucle for sur tous les produits récupérés pour créer les élements et les liens.
 for (let i = 0; i < produits.length; i++) {
 
     const imageElement = createImgElement(i);

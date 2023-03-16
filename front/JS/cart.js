@@ -11,17 +11,19 @@ await init();
 // Régénère l'ensemble de la page.
 async function init() {
 
-    // 1 - Récupèrer les données du LocalStorage.
+    // 1 - Récupèrer les données du LocalStorage et réinitialiser la quantité / le prix.
     chargeLS;
     total_quantity = 0;
     total_price = 0;
 
-    // 2 - On créer les élements à partir du produit récupéré et on calcul le total.
+    // 2 - Je crée les élements à partir du produit récupéré et je calcul le total prix et le total quantité.
     for (let i = 0; i < chargeLS.length; i++) {
 
+        // Je Récupére les données d'un produit avec la methode fetch.
         let reponsePageProduct = await collectProduct(chargeLS[i].id);
         dataproduct = await reponsePageProduct.json();
 
+        // Je crée les élements et ajoutes les eventlisteneurs
         createProductHtmlInCartAndMangeEvents(i, dataproduct)
 
         total_price += chargeLS[i].quantity * dataproduct.price;
@@ -33,50 +35,8 @@ async function init() {
     createCartTotalQuantity(total_quantity);
 }
 
-// Ajout d'un eventListener à chaques inputs quantités.
-function manageProductQuantityChanged(quantityInput) {
-    quantityInput.addEventListener("change", function () {
-
-        let collectQuantity = parseInt(quantityInput.value);
-        let collectId = quantityInput.closest(".cart__item").dataset.id;
-        let collectColor = quantityInput.closest(".cart__item").dataset.color;
-
-        let search = chargeLS.findIndex(product => product.id === collectId &&
-            product.color === collectColor && product.quantity !== collectQuantity);
-
-        if (search !== -1) {
-            chargeLS[search].quantity = collectQuantity;
-            saveLocalstorage("product", chargeLS);
-            deleteWithHtml("#cart__items");
-            deleteWithHtml("#totalQuantity");
-            deleteWithHtml("#totalPrice");
-            init();
-        }
-    });
-}
-
-// Ajout d'un eventListener à chaques bouttons delete et SUPPRIMER au click dans le LS.
-function manageProductDeleted(settingsDeleteItem) {
-    settingsDeleteItem.addEventListener("click", function () {
-
-        let collectId = settingsDeleteItem.closest(".cart__item").dataset.id;
-        let collectColor = settingsDeleteItem.closest(".cart__item").dataset.color;
-
-        for (let i = chargeLS.length - 1; i >= 0; i--) {
-            if (chargeLS[i].id === collectId && chargeLS[i].color === collectColor) {
-                chargeLS.splice(i, 1);
-                saveLocalstorage("product", chargeLS);
-                deleteWithHtml("#cart__items");
-                deleteWithHtml("#totalQuantity");
-                deleteWithHtml("#totalPrice");
-                init();
-            }
-        }
-    });
-}
-
 // Récupérer le localStorage.
-async function chargeLocalstorage() {
+function chargeLocalstorage() {
     return JSON.parse(localStorage.getItem("product"));
 }
 
@@ -178,8 +138,50 @@ function createProductHtmlInCartAndMangeEvents(index, product_to_create) {
     manageProductDeleted(settingsDeleteItem);
 }
 
+// Ajout d'un eventListener à chaques inputs quantités.
+function manageProductQuantityChanged(quantityInput) {
+    quantityInput.addEventListener("change", function () {
+
+        let collectQuantity = parseInt(quantityInput.value);
+        let collectId = quantityInput.closest(".cart__item").dataset.id;
+        let collectColor = quantityInput.closest(".cart__item").dataset.color;
+
+        let search = chargeLS.findIndex(product => product.id === collectId &&
+            product.color === collectColor && product.quantity !== collectQuantity);
+
+        if (search !== -1) {
+            chargeLS[search].quantity = collectQuantity;
+            saveLocalstorage("product", chargeLS);
+            deleteWithHtml("#cart__items");
+            deleteWithHtml("#totalQuantity");
+            deleteWithHtml("#totalPrice");
+            init();
+        }
+    });
+}
+
+// Ajout d'un eventListener à chaques bouttons delete et SUPPRIMER au click dans le LS.
+function manageProductDeleted(settingsDeleteItem) {
+    settingsDeleteItem.addEventListener("click", function () {
+
+        let collectId = settingsDeleteItem.closest(".cart__item").dataset.id;
+        let collectColor = settingsDeleteItem.closest(".cart__item").dataset.color;
+
+        for (let i = chargeLS.length - 1; i >= 0; i--) {
+            if (chargeLS[i].id === collectId && chargeLS[i].color === collectColor) {
+                chargeLS.splice(i, 1);
+                saveLocalstorage("product", chargeLS);
+                deleteWithHtml("#cart__items");
+                deleteWithHtml("#totalQuantity");
+                deleteWithHtml("#totalPrice");
+                init();
+            }
+        }
+    });
+}
+
 // Supprime une balise.
-async function deleteWithHtml(tag) {
+function deleteWithHtml(tag) {
     document.querySelector(tag).innerHTML = "";
 }
 
@@ -220,7 +222,7 @@ let submitForm = document.querySelector("#order");
 submitForm.addEventListener("click", function (e) {
     e.preventDefault();
 
-    // Mon objet contact.
+    // Mon objet contact pour la charge utile.
     let contact = {
         firstName: firstName.value,
         lastName: lastName.value,
@@ -229,19 +231,20 @@ submitForm.addEventListener("click", function (e) {
         email: email.value
     };
 
-    // Mon tableau product_id.
+    // Mon tableau product_id pour la charge utile.
     let products = [];
     for (let i = 0; i < chargeLS.length; i++) {
         products.push(chargeLS[i].id);
     }
 
-    // Mon objet à envoyer à l'API (contact, products).
+    // Mon objet (charge utile) à envoyer à l'API (contact, products).
     let chargeUtile = {
         contact,
         products
     }
 
-    // Vérifier tous les regexp pour valider. Si valide => requête POST.
+    // Vérifier tous les regexp pour valider. Si valide => requête POST
+    // => et au final je récupére le numéro de commande (orderId).
     if ((validFirstName(firstName) && validLastName(lastName)
         && validAddress(address) && validCity(city) && validEmail(email)) == true) {
 
@@ -253,10 +256,10 @@ submitForm.addEventListener("click", function (e) {
             .then(response => response.json())
             .then(data => window.location = `./confirmation.html?orderId=${data.orderId}`);
 
+        // Avant la redirection sur la page confirmation, je vide le localStorage.
         localStorage.removeItem("product");
 
     } else {
-        console.log("false");
         alert("Formulaire non valide");
     }
 });

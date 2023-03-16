@@ -67,7 +67,7 @@ document.querySelector("#addToCart")
                 chargeLS.push(choiceProduct);
                 localStorage.setItem("product", JSON.stringify(chargeLS));
 
-            // Si produit trouvé incrémenter la quantité du produit trouvé.
+                // Si produit trouvé incrémenter la quantité du produit trouvé.
             } else {
                 chargeLS[searchProduct].quantity += choiceProduct.quantity;
             }
