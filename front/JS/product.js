@@ -48,31 +48,43 @@ document.querySelector("#addToCart")
         // Si le LocalStorage est vide
         //  et que la couleur est différente de ""
         //  et que la quantité est différente de 0 alors ajouter le produit au tableau.
-        if (chargeLS === null && choiceColor !== "" && choiceQuantity !== 0) {
-            chargeLS = [];
-            chargeLS.push(choiceProduct);
+        if (choiceQuantity < 0) {
 
-            // Sauvegarder dans le LS.
-            localStorage.setItem("product", JSON.stringify(chargeLS));
+            //***** Modification demandé => l'utilisateur ne doit pas saisir de quantité négatives ******/
+            alert("Saisir une quantité positive")
 
         } else {
-
-            //FindIndex permet de trouver un produit... si le produit n'est pas trouver
-            // la méthode renvoie -1.
-            let searchProduct = chargeLS.findIndex((product => product.id === choiceProduct.id &&
-                product.color === choiceProduct.color));
-
-            // ajout d'un produit si le produit n'est pas trouvé et sauvegarder
-            if (searchProduct === -1 && choiceColor !== "" && choiceQuantity !== 0) {
+            if (chargeLS === null && choiceColor !== "" && choiceQuantity !== 0) {
+                chargeLS = [];
                 chargeLS.push(choiceProduct);
+
+                //***** Modification demandé => intéragir avec l'utilisateur *****/
+                alert("Produit ajouté au panier")
+
+                // Sauvegarder dans le LS.
                 localStorage.setItem("product", JSON.stringify(chargeLS));
 
-                // Si produit trouvé incrémenter la quantité du produit trouvé.
             } else {
-                chargeLS[searchProduct].quantity += choiceProduct.quantity;
+
+                //FindIndex permet de trouver un produit... si le produit n'est pas trouver
+                // la méthode renvoie -1.
+                let searchProduct = chargeLS.findIndex((product => product.id === choiceProduct.id &&
+                    product.color === choiceProduct.color));
+
+                // ajout d'un produit si le produit n'est pas trouvé et sauvegarder
+                if (searchProduct === -1 && choiceColor !== "" && choiceQuantity !== 0) {
+                    chargeLS.push(choiceProduct);
+                    alert("Produit ajouté au panier")
+                    localStorage.setItem("product", JSON.stringify(chargeLS));
+
+                    // Si produit trouvé incrémenter la quantité du produit trouvé.
+                } else {
+                    chargeLS[searchProduct].quantity += choiceProduct.quantity;
+                    alert("Quantité du produit modifié")
+                }
             }
+            localStorage.setItem("product", JSON.stringify(chargeLS));
         }
-        localStorage.setItem("product", JSON.stringify(chargeLS));
     });
 
 async function collectProduct() {

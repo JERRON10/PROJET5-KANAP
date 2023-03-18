@@ -50,20 +50,19 @@ async function saveLocalstorage(clé, valeur) {
     localStorage.setItem(clé, JSON.stringify(valeur));
 }
 
+
+//***** Modification demandé => avoir le nombre d'article et la prix final en une ligne *****/
 function createCartTotalPrice(total_price) {
-    let totalPrice = document.createElement("p");
-    totalPrice.innerText = total_price;
     let spanTotalPrice = document.querySelector("#totalPrice");
-    spanTotalPrice.appendChild(totalPrice);
+    spanTotalPrice.innerText = total_price;
 }
 
 function createCartTotalQuantity(total_quantity) {
     // Création des balises pour la quantité et le prix.
-    let totalQuantity = document.createElement("p");
-    totalQuantity.innerText = total_quantity;
     let spanTotalQuantity = document.querySelector("#totalQuantity");
-    spanTotalQuantity.appendChild(totalQuantity);
+    spanTotalQuantity.innerText = total_quantity
 }
+//*******************************************************************************************/
 
 function createProductHtmlInCartAndMangeEvents(index, product_to_create) {
     // 1 - Créer l'html.
@@ -149,13 +148,19 @@ function manageProductQuantityChanged(quantityInput) {
         let search = chargeLS.findIndex(product => product.id === collectId &&
             product.color === collectColor && product.quantity !== collectQuantity);
 
-        if (search !== -1) {
-            chargeLS[search].quantity = collectQuantity;
-            saveLocalstorage("product", chargeLS);
-            deleteWithHtml("#cart__items");
-            deleteWithHtml("#totalQuantity");
-            deleteWithHtml("#totalPrice");
-            init();
+        // ***** Modification demandé => aucune saisie négative + intéraction avec l'utilisateur *****/
+        if (collectQuantity < 0) {
+            alert("Saisir une quantité positive")
+
+        } else {
+            if (search !== -1) {
+                chargeLS[search].quantity = collectQuantity;
+                saveLocalstorage("product", chargeLS);
+                deleteWithHtml("#cart__items");
+                deleteWithHtml("#totalQuantity");
+                deleteWithHtml("#totalPrice");
+                init();
+            }
         }
     });
 }
@@ -254,10 +259,11 @@ submitForm.addEventListener("click", function (e) {
             body: JSON.stringify(chargeUtile)
         })
             .then(response => response.json())
-            .then(data => window.location = `./confirmation.html?orderId=${data.orderId}`);
-
-        // Avant la redirection sur la page confirmation, je vide le localStorage.
-        localStorage.removeItem("product");
+            .then(data => {
+                localStorage.removeItem("product");
+                window.location = `./confirmation.html?orderId=${data.orderId}`
+            }
+            ).catch(() => alert("le serveur n'est pas disponible"))
 
     } else {
         alert("Formulaire non valide");
