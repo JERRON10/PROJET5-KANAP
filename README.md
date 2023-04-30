@@ -1,6 +1,17 @@
-# Kanap #
+# PROJET5-KANAP
 
-This is the front end and back end server for Project 5 of the Web Developer path.
+Contexte: Kanap est une entreprise spécialisée dans la vente de canapé depuis sa boutique.
+Elle souhaite avoir une plateforme e-commerce pour vendre ses produits en ligne.
+
+Mission: Je dois Unifier les travaux déjà réalisés par l'équipe en intégrant dynamiquement les éléments de l'API dans les différentes pages web avec JavaScript.
+
+Réalisations:
+- Créer un plan de test pour une application
+- Valider des données issues de sources externes
+- Intéragir avec un web service avec JavaSript
+- Gérer des évenements JavaScript
+
+Installation...
 
 ### Back end Prerequisites ###
 
